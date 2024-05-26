@@ -24,10 +24,10 @@ def morse_to_text(morse_code):
     words = morse_code.strip().split("   ")
     translated_text = []
     for word in words:
-        if word not in MORSE_CODE_DICT.keys():
+        if word in MORSE_CODE_DICT.keys():
             translated_text.append("")
-        translated_word = ''.join(MORSE_CODE_DICT.get(char, '') for char in word.split())
-        translated_text.append(translated_word)
+            translated_word = ''.join(MORSE_CODE_DICT.get(char, '') for char in word.split())
+            translated_text.append(translated_word)
     return ' '.join(translated_text)
 
 
