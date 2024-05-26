@@ -24,9 +24,12 @@ def morse_to_text(morse_code):
     words = morse_code.strip().split("   ")
     translated_text = []
     for word in words:
+        if word not in MORSE_CODE_DICT.keys():
+            translated_text.append("")
         translated_word = ''.join(MORSE_CODE_DICT.get(char, '') for char in word.split())
         translated_text.append(translated_word)
     return ' '.join(translated_text)
+
 
 # Função para calcular a distância entre os lábios
 def mouth_aspect_ratio(landmarks):
@@ -38,7 +41,7 @@ def mouth_aspect_ratio(landmarks):
 MOUTH_THRESHOLD = 0.05  # Ajuste este valor conforme necessário
 DOT_DURATION = 0.3  # Duração de um ponto em segundos
 DASH_DURATION = 1.0  # Duração de um traço em segundos
-
+LETTER_PAUSE = 5.0  # Tempo de pausa entre letras em segundos
 morse_code = ""
 last_movement_time = time.time()
 mouth_open_time = None
@@ -78,7 +81,7 @@ while cap.isOpened():
     word = morse_to_text(morse_code)
     
     # Atualizar e mostrar a frase
-    if len(word) > 0 and time.time() - last_movement_time > 8:
+    if len(word) > 0 and time.time() - last_movement_time > LETTER_PAUSE:
         save_phrase.append(word)
         morse_code = ""  # Resetar após decodificação
         last_movement_time = time.time()  # Reiniciar o tempo do último movimento detectado
@@ -91,8 +94,12 @@ while cap.isOpened():
     cv2.putText(frame, f"Phrase: {phrase_text}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
     cv2.imshow('Frame', frame)
 
+    # Verificar se a tecla 'c' foi pressionada para limpar a frase
+    if cv2.waitKey(1) & 0xFF == ord('c'):
+        save_phrase.clear()
+
     if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+        break   
 
 cap.release()
 cv2.destroyAllWindows()
